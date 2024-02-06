@@ -4,12 +4,20 @@ const nameField = document.getElementById('name'),
     jobRoleSelect = document.getElementById('title'),
     designMenu = document.querySelector('#design'),
     activityRegister = document.getElementById('activities'),
-    activitiesTotal = document.getElementById('activities-cost');
+    activitiesTotal = document.getElementById('activities-cost'),
+    paymentMenu = document.getElementById('payment'),
+    bitcoinPayment = document.getElementById('bitcoin'),
+    paypalPayment = document.getElementById('paypal'),
+    creditCardPayment = document.getElementById('credit-card');
 
-// Set focus on name field, disable color select, and hide other job input
+// Set focus on name field, disable color select, and hide other job & non credit-card payment elements
 nameField.focus();
 colorSelect.disabled = true;
+paymentMenu.children[1].selected = true;
 otherJobInput.setAttribute('hidden', true);
+bitcoinPayment.setAttribute('hidden', true);
+paypalPayment.setAttribute('hidden', true);
+
 
 /**
  * Event listener for the change event on the jobRoleSelect element.
@@ -65,28 +73,22 @@ activityRegister.addEventListener('change', e => {
     activitiesTotal.textContent = `Total: $${totalCost}`;
 });
 
-const paymentMethod = document.getElementById('payment');
-const paymentOptions = paymentMethod.children;
-paymentOptions[1].selected = true;
-const bitcoinPayment = document.getElementById('bitcoin');
-const paypalPayment = document.getElementById('paypal');
-const creditCardPayment = document.getElementById('credit-card');
-bitcoinPayment.setAttribute('hidden', true);
-paypalPayment.setAttribute('hidden', true);
-
-paymentMethod.addEventListener('change', e => showPayment(e.target.value));
+/**
+ * Handles the display of payment options based on the selected payment choice.
+ * @param {string} paymentChoice - The selected payment choice ('bitcoin', 'paypal', or other).
+ */
 function showPayment (paymentChoice) {
+    bitcoinPayment.setAttribute('hidden',true);
+    paypalPayment.setAttribute('hidden', true);
+    creditCardPayment.setAttribute('hidden', true)
+
     if (paymentChoice === 'bitcoin') {
         bitcoinPayment.removeAttribute('hidden');
-        paypalPayment.setAttribute('hidden', true);
-        creditCardPayment.setAttribute('hidden', true);
     } else if (paymentChoice === 'paypal') {
-        bitcoinPayment.setAttribute('hidden',true);
         paypalPayment.removeAttribute('hidden');
-        creditCardPayment.setAttribute('hidden', true);
     } else {
-        bitcoinPayment.setAttribute('hidden', true);
-        paypalPayment.setAttribute('hidden', true);
         creditCardPayment.removeAttribute('hidden');
     }
 }
+paymentMenu.addEventListener('change', e => showPayment(e.target.value));
+
