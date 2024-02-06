@@ -1,18 +1,15 @@
-const nameField = document.getElementById('name');
-const colorSelect = document.getElementById('color');
-const otherJobInput = document.getElementById('other-job-role');
-const jobRoleSelect = document.getElementById('title');
-const designMenu = document.querySelector('#design');
-const activityRegister = document.getElementById('activities');
-const activitiesTotal = document.getElementById('activities-cost');
+const nameField = document.getElementById('name'),
+    colorSelect = document.getElementById('color'),
+    otherJobInput = document.getElementById('other-job-role'),
+    jobRoleSelect = document.getElementById('title'),
+    designMenu = document.querySelector('#design'),
+    activityRegister = document.getElementById('activities'),
+    activitiesTotal = document.getElementById('activities-cost');
 
-//Set focus on first form field && disable color select menu
+// Set focus on name field, disable color select, and hide other job input
 nameField.focus();
 colorSelect.disabled = true;
-
-//Hide 'Other' job role input until 'Other' option is selected
 otherJobInput.setAttribute('hidden', true);
-
 
 /**
  * Event listener for the change event on the jobRoleSelect element.
