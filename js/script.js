@@ -1,30 +1,36 @@
 const nameField = document.getElementById('name');
+const colorSelect = document.getElementById('color');
 const otherJobInput = document.getElementById('other-job-role');
 const jobRoleSelect = document.getElementById('title');
-const colorSelect = document.getElementById('color');
+const designMenu = document.querySelector('#design');
 
 //Set focus on first form field && disable color select menu
 nameField.focus();
 colorSelect.disabled = true;
 
-//Hide 'Other' job role input until 'Other' is selected in dropdown
-otherJobInput.style.display = 'none';
+//Hide 'Other' job role input until 'Other' option is selected
+otherJobInput.setAttribute('hidden', true);
 
 
-
-jobRoleSelect.addEventListener('change', e => {
+/**
+ * Event listener for the change event on the jobRoleSelect element.
+ * Toggles the hidden attribute of the otherJobInput element based on the selected value.
+ */
+jobRoleSelect.addEventListener('change', () => {
     const jobSelection = jobRoleSelect.value;
-    //console.log(jobSelection);
+
     if (jobSelection === 'other') {
-        otherJobInput.style.display = 'inherit';
+        otherJobInput.removeAttribute('hidden');
     } else {
-        otherJobInput.style.display = 'none';
+        otherJobInput.setAttribute('hidden', true);
     }
 });
 
-
-const designMenu = document.querySelector('#design');
-
+/**
+ * Event listener for the change event on the designMenu element
+ * Toggles 'hidden' on options that are not valid color matches
+ * @param {event} e - The event object
+ */
 designMenu.addEventListener('change', e => {
     colorSelect.disabled = false;
     const shirtSelection = e.target.value;
@@ -32,20 +38,11 @@ designMenu.addEventListener('change', e => {
 
     const matchingShirtColors = shirtColors.filter( color => {
         if (color.dataset.theme !== shirtSelection){
-            color.style.display = 'none';
+            color.setAttribute('hidden', true);
         } else {
-            color.style.display = 'block';
+            color.removeAttribute('hidden');
             return color;
         }
     });
     matchingShirtColors[0].selected = true;
 });
-/**
- * Disable the "Color" <select> element.
-    Set up the "Design" <select> element to listen for changes. When a change is detected:
-        The "Color" <select> element should be enabled.
-        The "Color" <select> element should display an available color.
-        The "Color" dropdown menu should display only the color options associated with the selected design. For example:
-        If the user selects "Theme - JS Puns" then the "Color" menu should only display "Cornflower Blue," "Dark Slate Grey," and "Gold."
-        If the user selects "Theme - I ♥ JS" then the "Color" menu should only display "Tomato," "Steel Blue," and "Dim Grey."
- */
