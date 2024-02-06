@@ -64,3 +64,29 @@ activityRegister.addEventListener('change', e => {
     }
     activitiesTotal.textContent = `Total: $${totalCost}`;
 });
+
+const paymentMethod = document.getElementById('payment');
+const paymentOptions = paymentMethod.children;
+paymentOptions[1].selected = true;
+const bitcoinPayment = document.getElementById('bitcoin');
+const paypalPayment = document.getElementById('paypal');
+const creditCardPayment = document.getElementById('credit-card');
+bitcoinPayment.setAttribute('hidden', true);
+paypalPayment.setAttribute('hidden', true);
+
+paymentMethod.addEventListener('change', e => showPayment(e.target.value));
+function showPayment (paymentChoice) {
+    if (paymentChoice === 'bitcoin') {
+        bitcoinPayment.removeAttribute('hidden');
+        paypalPayment.setAttribute('hidden', true);
+        creditCardPayment.setAttribute('hidden', true);
+    } else if (paymentChoice === 'paypal') {
+        bitcoinPayment.setAttribute('hidden',true);
+        paypalPayment.removeAttribute('hidden');
+        creditCardPayment.setAttribute('hidden', true);
+    } else {
+        bitcoinPayment.setAttribute('hidden', true);
+        paypalPayment.setAttribute('hidden', true);
+        creditCardPayment.removeAttribute('hidden');
+    }
+}
