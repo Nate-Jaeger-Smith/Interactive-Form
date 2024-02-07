@@ -8,11 +8,14 @@ const nameField = document.getElementById('name'),
     paymentMenu = document.getElementById('payment'),
     bitcoinPayment = document.getElementById('bitcoin'),
     paypalPayment = document.getElementById('paypal'),
-    creditCardPayment = document.getElementById('credit-card');
+    creditCardPayment = document.getElementById('credit-card'),
+    form = document.querySelector('form');
 
-// Set focus on name field, disable color select, and hide other job & non credit-card payment elements
+// Set focus on name field, disable color select
 nameField.focus();
 colorSelect.disabled = true;
+
+// Set credit-card as selected in paymentMenu and hide otherJobInput, bitcoinPayment, and paypalPayment elements
 paymentMenu.children[1].selected = true;
 otherJobInput.setAttribute('hidden', true);
 bitcoinPayment.setAttribute('hidden', true);
@@ -36,7 +39,7 @@ jobRoleSelect.addEventListener('change', () => {
 /**
  * Event listener for the change event on the designMenu element
  * Toggles 'hidden' on options that are not valid color matches
- * Sets color select element to display first 
+ * Sets color select element to display first matching color
  * @param {event} e - The event object
  */
 designMenu.addEventListener('change', e => {
@@ -75,7 +78,7 @@ activityRegister.addEventListener('change', e => {
 
 /**
  * Handles the display of payment options based on the selected payment choice.
- * @param {string} paymentChoice - The selected payment choice ('bitcoin', 'paypal', or other).
+ * @param {string} paymentChoice - The selected payment choice ('bitcoin', 'paypal', or credit-card).
  */
 function showPayment (paymentChoice) {
     bitcoinPayment.setAttribute('hidden',true);
@@ -86,9 +89,39 @@ function showPayment (paymentChoice) {
         bitcoinPayment.removeAttribute('hidden');
     } else if (paymentChoice === 'paypal') {
         paypalPayment.removeAttribute('hidden');
-    } else {
+    } else if (paymentChoice === 'credit-card') {
         creditCardPayment.removeAttribute('hidden');
     }
 }
 paymentMenu.addEventListener('change', e => showPayment(e.target.value));
+const emailInput = document.getElementById('email');
+const activityCheckboxes = [...document.querySelectorAll('[data-cost]')];
 
+form.addEventListener('submit', e => {
+    const username = nameField.value;
+    const userEmail = emailInput.value;
+    //Working
+    function isValidUsername(name) {
+        return /^[a-zA-Z0-9_\s?]+$/i.test(name);
+    }
+    //working
+    function isValidEmail(email){
+        return /[^@]+@[^@]+\.[a-z]+/i.test(email);
+    }
+    //Working
+    function selectedActivity(list){
+        const isChecked = list.find( checkbox => checkbox.checked);
+        return isChecked;
+    }
+
+    if (!isValidUsername(username)) {
+        e.preventDefault();
+    }
+    if (!isValidEmail(userEmail)) {
+        e.preventDefault();
+    }
+    if (!selectedActivity(activityCheckboxes)) {
+        e.preventDefault();
+        console.log('Please select and activity');
+    }
+});
