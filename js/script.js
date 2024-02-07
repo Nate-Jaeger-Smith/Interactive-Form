@@ -143,10 +143,15 @@ form.addEventListener('submit', e => {
     }
 });
 
-/**Program all of the activity checkbox input elements to listen for the focus and blur events.
-When the focus event is detected, add the ".focus" class to the checkbox input’s parent label element.
-When the blur event is detected, remove the .focus class from the label element that possesses it. 
-It can be helpful here to directly target the element with the className of .focus in order to remove it. */
+/**
+ * Adds or removes the 'focus' class to/from the parent label element
+ * when a child element of the activityRegister receives focus or loses focus.
+ */
 activityRegister.addEventListener('focusin', e => {
-        console.log(e.target);
+    const label = e.target.parentElement;    
+    label.classList.add('focus');
+});
+activityRegister.addEventListener('focusout', e => {
+    const label = e.target.parentElement;    
+    label.classList.remove('focus');
 });
