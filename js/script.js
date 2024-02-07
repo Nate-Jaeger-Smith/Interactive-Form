@@ -96,50 +96,75 @@ function showPayment (paymentChoice) {
 paymentMenu.addEventListener('change', e => showPayment(e.target.value));
 
 const emailInput = document.getElementById('email');
-const activityCheckboxes = [...document.querySelectorAll('[data-cost]')];
+const activityCheckboxes = document.querySelectorAll('[data-cost]');
 
+/**
+ * Event listener for form submission.
+ * Validates form inputs including username, email, selected activity, and credit-card details.
+ * Prevents form submission if any validation fails.
+ * @param {Event} e - The submit event object.
+ */
 form.addEventListener('submit', e => {
     const username = nameField.value,
         userEmail = emailInput.value,
-        cardNumber = document.getElementById('cc-num').value,
-        cardZip = document.getElementById('zip').value,
-        cardCVV = document.getElementById('cvv').value;
+        cardNumber = document.getElementById('cc-num'),
+        cardZip = document.getElementById('zip'),
+        cardCVV = document.getElementById('cvv');
     
+    function notValidInput(element){
+        e.preventDefault();
+        const parent = element.parentElement;
+        parent.classList.remove('valid');
+        parent.classList.add('not-valid');
+        parent.lastElementChild.style.display = 'block';
+        return false;
+    }
+    function validInput(element){
+        const parent = element.parentElement;
+        parent.classList.remove('not-valid');
+        parent.classList.add('valid');
+        parent.lastElementChild.style.display = 'none';
+        return true;
+    }
+
     function isValidUsername(name) {
-        return /^[a-zA-Z0-9_\s?]+$/i.test(name);
+        if ( /^[a-zA-Z0-9_\s?]+$/i.test(name) ) {
+            validInput(nameField);
+        } else {
+            notValidInput(nameField);
+        }
     }
     function isValidEmail(email){
-        return /[^@]+@[^@]+\.[a-z]+/i.test(email);
+        if ( /[^@]+@[^@]+\.[a-z]+/i.test(email) ) {
+            validInput(emailInput);
+        } else {
+            notValidInput(emailInput);
+        }
     }
     function selectedActivity(list){
-        const isChecked = list.find( checkbox => checkbox.checked);
-        return isChecked;
+        const isChecked = [...list].find( checkbox => checkbox.checked);
+        const parent = activityCheckboxes[0].parentElement.parentElement;
+        if (isChecked) {
+            validInput(parent);
+        } else {
+            notValidInput(parent);
+        }
     }
     function isValidCard(numb, zip, cvv){
         const validNumber = /^[0-9]{13,16}$/.test(numb),
             validZip = /^[0-9]{5}$/.test(zip),
             validCVV = /^[0-9]{3}$/.test(cvv);
 
-        if (validNumber && validZip && validCVV) {
-            return true;
-        } else {
-            return false;
-        }
+        validNumber ? validInput(cardNumber) : notValidInput(cardNumber);
+        validZip ? validInput(cardZip) : notValidInput(cardZip);
+        validCVV ? validInput(cardCVV) : notValidInput(cardCVV);
     }
 
-    if (!isValidUsername(username)) {
-        e.preventDefault();
-    }
-    if (!isValidEmail(userEmail)) {
-        e.preventDefault();
-    }
-    if (!selectedActivity(activityCheckboxes)) {
-        e.preventDefault();
-    }
+    isValidUsername(username);
+    isValidEmail(userEmail);
+    selectedActivity(activityCheckboxes);
     if (paymentMenu.value === 'credit-card'){
-        if (!isValidCard(cardNumber, cardZip, cardCVV)) {
-            e.preventDefault();
-        }
+        isValidCard(cardNumber.value, cardZip.value, cardCVV.value)
     }
 });
 
