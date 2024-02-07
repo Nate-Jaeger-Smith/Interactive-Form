@@ -100,6 +100,10 @@ const activityCheckboxes = [...document.querySelectorAll('[data-cost]')];
 form.addEventListener('submit', e => {
     const username = nameField.value;
     const userEmail = emailInput.value;
+    const cardNumber = document.getElementById('cc-num').value,
+            cardZip = document.getElementById('zip').value,
+            cardCVV = document.getElementById('cvv').value;
+    
     //Working
     function isValidUsername(name) {
         return /^[a-zA-Z0-9_\s?]+$/i.test(name);
@@ -113,6 +117,17 @@ form.addEventListener('submit', e => {
         const isChecked = list.find( checkbox => checkbox.checked);
         return isChecked;
     }
+    function isValidCard(numb, zip, cvv){
+        const validNumber = /^[0-9]{13,16}$/.test(numb);
+        const validZip = /^[0-9]{5}$/.test(zip);
+        const validCVV = /^[0-9]{3}$/.test(cvv);
+
+        if (validNumber && validZip && validCVV) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     if (!isValidUsername(username)) {
         e.preventDefault();
@@ -122,6 +137,10 @@ form.addEventListener('submit', e => {
     }
     if (!selectedActivity(activityCheckboxes)) {
         e.preventDefault();
-        console.log('Please select and activity');
+    }
+    if (paymentMenu.value === 'credit-card'){
+        if (!isValidCard(cardNumber, cardZip, cardCVV)) {
+            e.preventDefault();
+        }
     }
 });
