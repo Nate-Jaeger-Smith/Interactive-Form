@@ -3,7 +3,7 @@ const nameField = document.getElementById('name'),
     otherJobInput = document.getElementById('other-job-role'),
     jobRoleSelect = document.getElementById('title'),
     designMenu = document.querySelector('#design'),
-    activityRegister = document.getElementById('activities'),
+    activityRegister = document.getElementById('activities-box'),
     activitiesTotal = document.getElementById('activities-cost'),
     paymentMenu = document.getElementById('payment'),
     bitcoinPayment = document.getElementById('bitcoin'),
@@ -94,33 +94,31 @@ function showPayment (paymentChoice) {
     }
 }
 paymentMenu.addEventListener('change', e => showPayment(e.target.value));
+
 const emailInput = document.getElementById('email');
 const activityCheckboxes = [...document.querySelectorAll('[data-cost]')];
 
 form.addEventListener('submit', e => {
-    const username = nameField.value;
-    const userEmail = emailInput.value;
-    const cardNumber = document.getElementById('cc-num').value,
-            cardZip = document.getElementById('zip').value,
-            cardCVV = document.getElementById('cvv').value;
+    const username = nameField.value,
+        userEmail = emailInput.value,
+        cardNumber = document.getElementById('cc-num').value,
+        cardZip = document.getElementById('zip').value,
+        cardCVV = document.getElementById('cvv').value;
     
-    //Working
     function isValidUsername(name) {
         return /^[a-zA-Z0-9_\s?]+$/i.test(name);
     }
-    //working
     function isValidEmail(email){
         return /[^@]+@[^@]+\.[a-z]+/i.test(email);
     }
-    //Working
     function selectedActivity(list){
         const isChecked = list.find( checkbox => checkbox.checked);
         return isChecked;
     }
     function isValidCard(numb, zip, cvv){
-        const validNumber = /^[0-9]{13,16}$/.test(numb);
-        const validZip = /^[0-9]{5}$/.test(zip);
-        const validCVV = /^[0-9]{3}$/.test(cvv);
+        const validNumber = /^[0-9]{13,16}$/.test(numb),
+            validZip = /^[0-9]{5}$/.test(zip),
+            validCVV = /^[0-9]{3}$/.test(cvv);
 
         if (validNumber && validZip && validCVV) {
             return true;
@@ -143,4 +141,15 @@ form.addEventListener('submit', e => {
             e.preventDefault();
         }
     }
+});
+
+/**Program all of the activity checkbox input elements to listen for the focus and blur events.
+When the focus event is detected, add the ".focus" class to the checkbox input’s parent label element.
+When the blur event is detected, remove the .focus class from the label element that possesses it. 
+It can be helpful here to directly target the element with the className of .focus in order to remove it. */
+activityRegister.addEventListener('focus', e => {
+    if (e.target.tagName === 'INPUT') {
+        console.log(e.target);
+        
+      }
 });
