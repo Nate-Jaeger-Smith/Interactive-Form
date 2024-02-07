@@ -9,7 +9,12 @@ const nameField = document.getElementById('name'),
     bitcoinPayment = document.getElementById('bitcoin'),
     paypalPayment = document.getElementById('paypal'),
     creditCardPayment = document.getElementById('credit-card'),
-    form = document.querySelector('form');
+    form = document.querySelector('form'),
+    emailInput = document.getElementById('email'),
+    activityCheckboxes = document.querySelectorAll('[data-cost]'),
+    cardNumber = document.getElementById('cc-num'),
+    cardZip = document.getElementById('zip'),
+    cardCVV = document.getElementById('cvv');
 
 // Set focus on name field, disable color select
 nameField.focus();
@@ -95,76 +100,41 @@ function showPayment (paymentChoice) {
 }
 paymentMenu.addEventListener('change', e => showPayment(e.target.value));
 
-const emailInput = document.getElementById('email');
-const activityCheckboxes = document.querySelectorAll('[data-cost]');
 
-/**
- * Event listener for form submission.
- * Validates form inputs including username, email, selected activity, and credit-card details.
- * Prevents form submission if any validation fails.
- * @param {Event} e - The submit event object.
- */
+
+function validateInput(element, regex){
+    const isValid = regex.test(element.value);
+    updateValidity(element, isValid);
+    return isValid;
+}
+function updateValidity(element, isValid){
+    const parent = element.parentElement;
+    parent.classList.toggle('valid', isValid);
+    parent.classList.toggle('not-valid', !isValid);
+    parent.lastElementChild.style.display = isValid ? 'none' : 'block';
+}
+
 form.addEventListener('submit', e => {
-    const username = nameField.value,
-        userEmail = emailInput.value,
-        cardNumber = document.getElementById('cc-num'),
-        cardZip = document.getElementById('zip'),
-        cardCVV = document.getElementById('cvv');
-    
-    function notValidInput(element){
-        e.preventDefault();
-        const parent = element.parentElement;
-        parent.classList.remove('valid');
-        parent.classList.add('not-valid');
-        parent.lastElementChild.style.display = 'block';
-        return false;
-    }
-    function validInput(element){
-        const parent = element.parentElement;
-        parent.classList.remove('not-valid');
-        parent.classList.add('valid');
-        parent.lastElementChild.style.display = 'none';
-        return true;
-    }
+    const username = validateInput(nameField, /^[a-zA-Z0-9_\s?]+$/i),
+        userEmail = validateInput(emailInput, /[^@]+@[^@]+\.[a-z]+/i),
+        isCardSelected = paymentMenu.value === 'credit-card',
+        activitySelected = [...activityCheckboxes].find(checkbox => checkbox.checked),
+        isCardValid = isCardSelected ? isValidCard(cardNumber.value, cardZip.value, cardCVV.value): true ;
 
-    function isValidUsername(name) {
-        if ( /^[a-zA-Z0-9_\s?]+$/i.test(name) ) {
-            validInput(nameField);
-        } else {
-            notValidInput(nameField);
-        }
+    updateValidity(activityCheckboxes[0].parentElement.parentElement, activitySelected);
+
+    if ( !username || !userEmail || !isCardValid || !activitySelected) {
+        e.preventDefault();
     }
-    function isValidEmail(email){
-        if ( /[^@]+@[^@]+\.[a-z]+/i.test(email) ) {
-            validInput(emailInput);
-        } else {
-            notValidInput(emailInput);
-        }
-    }
-    function selectedActivity(list){
-        const isChecked = [...list].find( checkbox => checkbox.checked);
-        const parent = activityCheckboxes[0].parentElement.parentElement;
-        if (isChecked) {
-            validInput(parent);
-        } else {
-            notValidInput(parent);
-        }
-    }
+    
     function isValidCard(numb, zip, cvv){
         const validNumber = /^[0-9]{13,16}$/.test(numb),
-            validZip = /^[0-9]{5}$/.test(zip),
-            validCVV = /^[0-9]{3}$/.test(cvv);
-
-        validNumber ? validInput(cardNumber) : notValidInput(cardNumber);
-        validZip ? validInput(cardZip) : notValidInput(cardZip);
-        validCVV ? validInput(cardCVV) : notValidInput(cardCVV);
-    }
-
-    isValidUsername(username);
-    isValidEmail(userEmail);
-    selectedActivity(activityCheckboxes);
-    if (paymentMenu.value === 'credit-card'){
-        isValidCard(cardNumber.value, cardZip.value, cardCVV.value)
+                validZip = /^[0-9]{5}$/.test(zip),
+                validCVV = /^[0-9]{3}$/.test(cvv);
+        updateValidity(cardNumber, validNumber);
+        updateValidity(cardZip, validZip);
+        updateValidity(cardCVV, validCVV);
+        return validNumber && validZip && validCVV;
     }
 });
 
