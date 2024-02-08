@@ -11,19 +11,23 @@ const nameField = document.getElementById( 'name' ),
 	creditCardPayment = document.getElementById( 'credit-card' ),
 	form = document.querySelector( 'form' ),
 	emailInput = document.getElementById( 'email' ),
+    emailHint = emailInput.nextElementSibling,
 	activityCheckboxes = document.querySelectorAll( '[data-cost]' ),
 	checkboxParent = activityCheckboxes[ 0 ].parentElement.parentElement,
 	cardNumber = document.getElementById( 'cc-num' ),
 	cardZip = document.getElementById( 'zip' ),
 	cardCVV = document.getElementById( 'cvv' );
-// Set focus on name field, disable color select
+
+// Set focus on name field, disable color select.
 nameField.focus();
 colorSelect.disabled = true;
-// Set credit-card as selected in paymentMenu and hide otherJobInput, bitcoinPayment, and paypalPayment elements
+
+// Set credit-card as selected in paymentMenu and hide otherJobInput, bitcoinPayment, and paypalPayment elements.
 paymentMenu.children[ 1 ].selected = true;
 otherJobInput.setAttribute( 'hidden', true );
 bitcoinPayment.setAttribute( 'hidden', true );
 paypalPayment.setAttribute( 'hidden', true );
+
 /**
  * Event listener for the change event on the jobRoleSelect element.
  * Toggles the hidden attribute of the otherJobInput element based on the selected value.
@@ -36,10 +40,11 @@ jobRoleSelect.addEventListener( 'change', () => {
 		otherJobInput.setAttribute( 'hidden', true );
 	}
 } );
+
 /**
- * Event listener for the change event on the designMenu element
- * Toggles 'hidden' on options that are not valid color matches
- * Sets color select element to display first matching color
+ * Event listener for the change event on the designMenu element.
+ * Toggles 'hidden' on options that are not valid color matches.
+ * Sets color select element to display first matching color.
  * @param {event} e - The event object
  */
 designMenu.addEventListener( 'change', e => {
@@ -56,6 +61,7 @@ designMenu.addEventListener( 'change', e => {
 	} );
 	matchingShirtColors[ 0 ].selected = true;
 } );
+
 let totalCost = 0;
 /**
  * Event listener for the change event on the activityRegister fieldset.
@@ -82,6 +88,7 @@ activityRegister.addEventListener( 'change', e => {
 			}
 		} );
 } );
+
 /**
  * Handles the display of payment options based on the selected payment choice.
  * @param {string} paymentChoice - The selected payment choice ('bitcoin', 'paypal', or 'credit-card').
@@ -99,6 +106,7 @@ function showPayment( paymentChoice ) {
 	}
 } //Call showPayment when payment method changes
 paymentMenu.addEventListener( 'change', e => showPayment( e.target.value ) );
+
 /**
  * Validates the input value of the given element against a given regular expression.
  * Updates the styles of the parent element based on the validation result.
@@ -111,6 +119,7 @@ function validateInput( element, regex ) {
 	updateValidStyle( element, isValid );
 	return isValid;
 }
+
 /**
  * Updates the style of the parent element based on the validation result.
  * Adds or removes 'valid' and 'not-valid' classes to the parent element.
@@ -124,6 +133,7 @@ function updateValidStyle( element, isValid ) {
 	parent.classList.toggle( 'not-valid', !isValid );
 	parent.lastElementChild.style.display = isValid ? 'none' : 'block';
 }
+
 /**
  * Event listener for form submission.
  * Validates form inputs including username, email, selected activity, and credit-card details.
@@ -151,9 +161,10 @@ form.addEventListener( 'submit', e => {
 		return validNumber && validZip && validCVV;
 	}
 } );
+
 /**
- * Adds the 'focus' class to the checkbox's parent label element when in focus
- * Removes the 'focus' class on the checkbox's parent label element when out of focus
+ * Adds the 'focus' class to the checkbox's parent label element when in focus.
+ * Removes the 'focus' class on the checkbox's parent label element when out of focus.
  */
 activityRegister.addEventListener( 'focusin', e => {
 	const label = e.target.parentElement;
@@ -163,5 +174,19 @@ activityRegister.addEventListener( 'focusout', e => {
 	const label = e.target.parentElement;
 	label.classList.remove( 'focus' );
 } );
-//Event listener for 'keyup' on email input. Provides real time error messaging
-emailInput.addEventListener( 'keyup', () => validateInput( emailInput, /[^@]+@[^@]+\.[a-z]+/i ) );
+
+// Event listener for 'keyup' on cardNumber input. Provides real-time error messaging.
+cardNumber.addEventListener( 'keyup', () => validateInput( cardNumber, /^[0-9]{13,16}$/ ) );
+
+// Validates the email input value on keyup and displays appropriate error messages.
+emailInput.addEventListener( 'keyup', () => {
+    const email = emailInput.value;
+    if ( email.length !== 0 ) {
+        validateInput( emailInput, /[^@]+@[^@]+\.[a-z]+/i );
+        if ( !/@\w+\./.test( email ) ) {
+            emailHint.textContent = "Email must contain a '@' and '.' character";
+        }
+    } else {
+        emailHint.textContent = "Email field cannot be left blank";
+    }
+});
