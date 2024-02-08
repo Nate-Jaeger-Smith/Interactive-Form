@@ -178,13 +178,3 @@ activityRegister.addEventListener('focusout', e => {
     const label = e.target.parentElement;    
     label.classList.remove('focus');
 });
-
-//Disable conflicting times
-activityRegister.addEventListener('click', e => {
-
-});
-
-
-//When a user selects an activity, loop over all of the activities to check if any have the same day and time
-// as the selected activity. If so, disable/enable the conflicting activity’s checkbox input and add or remove 
-// the ‘disabled’ class to activity’s parent label element.
