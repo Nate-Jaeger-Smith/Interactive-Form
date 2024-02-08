@@ -12,6 +12,7 @@ const nameField = document.getElementById('name'),
     form = document.querySelector('form'),
     emailInput = document.getElementById('email'),
     activityCheckboxes = document.querySelectorAll('[data-cost]'),
+    checkboxParent = activityCheckboxes[0].parentElement.parentElement,
     cardNumber = document.getElementById('cc-num'),
     cardZip = document.getElementById('zip'),
     cardCVV = document.getElementById('cvv');
@@ -25,7 +26,6 @@ paymentMenu.children[1].selected = true;
 otherJobInput.setAttribute('hidden', true);
 bitcoinPayment.setAttribute('hidden', true);
 paypalPayment.setAttribute('hidden', true);
-
 
 /**
  * Event listener for the change event on the jobRoleSelect element.
@@ -63,7 +63,6 @@ designMenu.addEventListener('change', e => {
     matchingShirtColors[0].selected = true;
 });
 
-
 let totalCost = 0;
 /**
  * Event listener for the change event on the activityRegister fieldset.
@@ -83,7 +82,7 @@ activityRegister.addEventListener('change', e => {
 
 /**
  * Handles the display of payment options based on the selected payment choice.
- * @param {string} paymentChoice - The selected payment choice ('bitcoin', 'paypal', or credit-card).
+ * @param {string} paymentChoice - The selected payment choice ('bitcoin', 'paypal', or 'credit-card').
  */
 function showPayment (paymentChoice) {
     bitcoinPayment.setAttribute('hidden',true);
@@ -101,12 +100,25 @@ function showPayment (paymentChoice) {
 paymentMenu.addEventListener('change', e => showPayment(e.target.value));
 
 
-
+/**
+ * Validates the input value of the given element against a given regular expression.
+ * Updates the styles of the parent element based on the validation result.
+ * @param {HTMLElement} element - The element to be validated.
+ * @param {RegExp} regex - The regular expression used.
+ * @returns {boolean} - Indicates whether the input passed validation.
+ */
 function validateInput(element, regex){
     const isValid = regex.test(element.value);
     updateValidity(element, isValid);
     return isValid;
 }
+/**
+ * Updates the style of the parent element based on the validation result.
+ * Adds or removes 'valid' and 'not-valid' classes to the parent element.
+ * Toggles the display of the last-child element based on the validation result.
+ * @param {HTMLElement} element - The input element whose style is being updated.
+ * @param {boolean} isValid - The validity of the input element.
+ */
 function updateValidity(element, isValid){
     const parent = element.parentElement;
     parent.classList.toggle('valid', isValid);
@@ -114,17 +126,22 @@ function updateValidity(element, isValid){
     parent.lastElementChild.style.display = isValid ? 'none' : 'block';
 }
 
+/**
+ * Event listener for form submission.
+ * Validates form inputs including username, email, selected activity, and credit-card details.
+ * Prevents form submission if any validation fails.
+ * @param {Event} e - The submit event object.
+ */
 form.addEventListener('submit', e => {
     const username = validateInput(nameField, /^[a-zA-Z0-9_\s?]+$/i),
         userEmail = validateInput(emailInput, /[^@]+@[^@]+\.[a-z]+/i),
+        isActivitySelected = totalCost !== 0,
         isCardSelected = paymentMenu.value === 'credit-card',
-        activitySelected = [...activityCheckboxes].find(checkbox => checkbox.checked),
         isCardValid = isCardSelected ? isValidCard(cardNumber.value, cardZip.value, cardCVV.value): true ;
 
-    updateValidity(activityCheckboxes[0].parentElement.parentElement, activitySelected);
-
-    if ( !username || !userEmail || !isCardValid || !activitySelected) {
+    if ( !username || !userEmail || !isCardValid || !isActivitySelected) {
         e.preventDefault();
+        updateValidity(checkboxParent, isActivitySelected);
     }
     
     function isValidCard(numb, zip, cvv){
@@ -139,8 +156,8 @@ form.addEventListener('submit', e => {
 });
 
 /**
- * Adds or removes the 'focus' class to/from the parent label element
- * when a child element of the activityRegister receives focus or loses focus.
+ * Adds the 'focus' class to the parent label element when in focus
+ * Removes the 'focus' class on the parent label element when out of focus
  */
 activityRegister.addEventListener('focusin', e => {
     const label = e.target.parentElement;    
