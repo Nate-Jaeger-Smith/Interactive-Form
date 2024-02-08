@@ -70,14 +70,26 @@ let totalCost = 0;
  * @param {Event} e - The event object.
  */
 activityRegister.addEventListener('change', e => {
-    const activity = e.target;
-    const cost = parseInt(activity.dataset.cost);
-    if (activity.checked) {
-        totalCost += cost;
-    } else {
-        totalCost -= cost;
-    }
+    const activity = e.target,
+        cost = parseInt(activity.dataset.cost),
+        dateAndTime = activity.dataset.dayAndTime,
+        activityArray = [...activityCheckboxes];
+
+    activity.checked ? totalCost += cost : totalCost -= cost ;
     activitiesTotal.textContent = `Total: $${totalCost}`;
+    
+   activityArray.filter( checkbox => checkbox.dataset.dayAndTime === dateAndTime)
+        .forEach( checkbox => {
+            if (activity.checked) {
+                if (checkbox !== activity) {
+                    checkbox.disabled = true;
+                    checkbox.parentElement.classList.add('disabled');
+                } 
+            } else {
+                checkbox.removeAttribute('disabled');
+                checkbox.parentElement.classList.remove('disabled');
+            }
+        });
 });
 
 /**
@@ -99,7 +111,6 @@ function showPayment (paymentChoice) {
 }
 paymentMenu.addEventListener('change', e => showPayment(e.target.value));
 
-
 /**
  * Validates the input value of the given element against a given regular expression.
  * Updates the styles of the parent element based on the validation result.
@@ -109,7 +120,7 @@ paymentMenu.addEventListener('change', e => showPayment(e.target.value));
  */
 function validateInput(element, regex){
     const isValid = regex.test(element.value);
-    updateValidity(element, isValid);
+    updateValidStyle(element, isValid);
     return isValid;
 }
 /**
@@ -119,7 +130,7 @@ function validateInput(element, regex){
  * @param {HTMLElement} element - The input element whose style is being updated.
  * @param {boolean} isValid - The validity of the input element.
  */
-function updateValidity(element, isValid){
+function updateValidStyle(element, isValid){
     const parent = element.parentElement;
     parent.classList.toggle('valid', isValid);
     parent.classList.toggle('not-valid', !isValid);
@@ -141,23 +152,23 @@ form.addEventListener('submit', e => {
 
     if ( !username || !userEmail || !isCardValid || !isActivitySelected) {
         e.preventDefault();
-        updateValidity(checkboxParent, isActivitySelected);
+        updateValidStyle(checkboxParent, isActivitySelected);
     }
     
     function isValidCard(numb, zip, cvv){
         const validNumber = /^[0-9]{13,16}$/.test(numb),
                 validZip = /^[0-9]{5}$/.test(zip),
                 validCVV = /^[0-9]{3}$/.test(cvv);
-        updateValidity(cardNumber, validNumber);
-        updateValidity(cardZip, validZip);
-        updateValidity(cardCVV, validCVV);
+        updateValidStyle(cardNumber, validNumber);
+        updateValidStyle(cardZip, validZip);
+        updateValidStyle(cardCVV, validCVV);
         return validNumber && validZip && validCVV;
     }
 });
 
 /**
- * Adds the 'focus' class to the parent label element when in focus
- * Removes the 'focus' class on the parent label element when out of focus
+ * Adds the 'focus' class to the checkbox's parent label element when in focus
+ * Removes the 'focus' class on the checkbox's parent label element when out of focus
  */
 activityRegister.addEventListener('focusin', e => {
     const label = e.target.parentElement;    
@@ -167,3 +178,13 @@ activityRegister.addEventListener('focusout', e => {
     const label = e.target.parentElement;    
     label.classList.remove('focus');
 });
+
+//Disable conflicting times
+activityRegister.addEventListener('click', e => {
+
+});
+
+
+//When a user selects an activity, loop over all of the activities to check if any have the same day and time
+// as the selected activity. If so, disable/enable the conflicting activity’s checkbox input and add or remove 
+// the ‘disabled’ class to activity’s parent label element.
