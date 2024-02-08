@@ -178,3 +178,6 @@ activityRegister.addEventListener('focusout', e => {
     const label = e.target.parentElement;    
     label.classList.remove('focus');
 });
+
+//Event listener for 'keyup' on email input. Provides real time error messaging
+emailInput.addEventListener('keyup', () => validateInput(emailInput, /[^@]+@[^@]+\.[a-z]+/i));
